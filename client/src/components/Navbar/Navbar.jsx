@@ -13,13 +13,13 @@ export default function Navbar() {
                     <ul
                         tabIndex={0}
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                        <li><Link>Explore</Link></li>
+                        <li><Link to="/explore">Explore</Link></li>
                         <li><Link to="/test">Brainrot test</Link></li>
                         <li><Link>About</Link></li>
                     </ul>
                 </div>
                 <div className='hidden lg:flex gap-5'>
-                    <Link class="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
+                    <Link to="/explore" class="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
                     <Link to="/test" class="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
                     <Link class="btn hover:bg-primary rounded-2xl btn-ghost">About</Link>
                 </div>

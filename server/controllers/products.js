@@ -5,19 +5,24 @@ const path = require("path")
 exports.getAllProducts = async (req, res, next) => {
     try {
         const data = await products.find();
-        if (data && data.length != 0) {
+
+        if (data && data.length !== 0) {
+            const enriched = await Promise.all(data.map(updateIsNewIfNeeded));
+
             return res.status(200).send({
                 message: "Products found",
-                payload: data
-            })
-        } res.status(500).send({
+                payload: enriched
+            });
+        }
+
+        res.status(404).send({
             message: "Products not found"
-        })
+        });
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
     }
-}
+};
 
 exports.getProductById = async (req, res, next) => {
     try {
@@ -28,7 +33,7 @@ exports.getProductById = async (req, res, next) => {
                 payload: data
             })
         } res.status(404).send({
-            message: "Products not found"
+            message: "Product not found"
         })
     } catch (err) {
         console.log(err);
@@ -37,25 +42,47 @@ exports.getProductById = async (req, res, next) => {
 
 }
 
+const updateIsNewIfNeeded = async (product) => {
+    if (!product.isNew) return product.toObject();
+
+    const daysSince = (Date.now() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24);
+    const stillNew = daysSince <= 30;
+
+    if (!stillNew) {
+        product.isNew = false;
+        await product.save();
+    }
+
+    return {
+        ...product.toObject(),
+        isNew: stillNew
+    };
+};
+
 exports.createProduct = async (req, res, next) => {
     try {
+
+        const imageName = req.file ? req.file.filename : null;
 
         const data = new products({
             name: req.body.name,
             price: req.body.price,
             brainrotLevel: req.body.brainrotLevel,
             desc: req.body.desc,
+            collection: req.body.collection,
+            isNew: true,
+            image: imageName
 
         })
         const result = await data.save();
 
         if (result) {
             return res.status(201).send({
-                message: "Products created",
+                message: "Product created",
                 payload: result
             })
         } res.status(500).send({
-            message: "Products not created"
+            message: "Product not created"
         })
     } catch (err) {
         console.log(err);
@@ -71,6 +98,7 @@ exports.updateProducts = async (req, res, next) => {
             price: req.body.price,
             brainrotLevel: req.body.brainrotLevel,
             desc: req.body.desc,
+            collection: req.body.collection,
 
 
         }
@@ -98,6 +126,7 @@ exports.deleteProducts = async (req, res, next) => {
             price: req.body.price,
             brainrotLevel: req.body.brainrotLevel,
             desc: req.body.desc,
+            collection: req.body.collection,
 
 
         }

@@ -1,0 +1,32 @@
+/* Styly pro animaci posuvného textu */
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+        /* Explicitně použij procenta */
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 15s linear infinite;
+    /* Doba, typ, nekonečná smyčka */
+
+    /* Klíčové pro plynulou smyčku s duplikátem: */
+    white-space: nowrap;
+    /* Zabrání zalamování textu */
+    display: inline-block;
+    /* Umožní elementu mít šířku podle obsahu a správně pracovat s transformací */
+    /* Přidání minimální šířky, která zajistí, že element bude dostatečně široký.
+     Hodnota 200% je dvojnásobek 100%, což by mělo pokrýt obě kopie textu.
+     Můžeš zkusit i větší hodnotu, např. 300%, pokud 200% nestačí na zakrytí skoku. */
+    min-width: 200%;
+    /* Zkusíme zajistit dostatečnou šířku */
+
+    /* Volitelné: Pokud by stále docházelo k nepatrnému záškubu,
+     někdy pomůže hardwarová akcelerace, i když u transformací by měla být automatická. */
+    /* transform: translateZ(0); */
+}
