@@ -10,20 +10,22 @@ export default function ProductCard({ product }) {
                 <img
                     src={product.imageUrl}
                     alt="product image"
-                    className="rounded-xl h-[20rem]" />
+                    className="rounded-xl h-[20rem] object-contain" />
             </figure>
             <div className="card-body flex justify-end flex-col w-full">
-                <div className="flex flex-row justify-between">
-                    <div className="flex flex-row gap-5 items-center">
-                        <h2 className="card-title font-light">{product.name}</h2>
-                        {product.isNew && (
-                            <div className="badge badge-soft h-5 text-xs badge-secondary">NEW</div>
-                        )}
+                <div className="flex flex-row justify-between ">
+                            <h2 className="card-title font-light">{product.name}</h2>
+                    <div className="flex flex-row">
+                        <div className="flex flex-row items-center">
+                            {product.isNew && (
+                                <div className="badge badge-soft h-5 text-xs badge-secondary">NEW</div>
+                            )}
+                        </div>
                     </div>
-                    <div className="badge badge-soft badge-primary">{product.collection}</div>
                 </div>
-                <div className="">
+                <div className="flex flex-row justify-between">
                     <h3 className="card-title">{product.price + " Kč"}</h3>
+                    <div className="badge badge-soft badge-primary">{product.collection}</div>
                 </div>
                 <div className="card-actions w-full">
                     <Link className="w-full" to={`/product/${product._id}`} key={product._id}>

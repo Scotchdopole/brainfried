@@ -1,6 +1,7 @@
 import Navbar from '../../components/Navbar/Navbar'
-import { data, Link, useNavigate, useRouteLoaderData } from 'react-router-dom'
+import { Link, useNavigate, useRouteLoaderData } from 'react-router-dom'
 import React, { useRef, useState, useEffect } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
 import { useAuth } from "../../authContext"
 
 export default function LoginForm() {
@@ -30,8 +31,6 @@ export default function LoginForm() {
         }
     };
 
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -45,6 +44,15 @@ export default function LoginForm() {
             }
 
             setIsLoading(false);
+            toast.success("Successfully logged in", {
+                style: {
+                    borderRadius: '10px',
+                    background: '#191e24',
+                    color: '#fff',
+                },
+                position: "top-center",
+                duration: 5000
+            });
             const userId = getUserIdFromToken();
 
             if (userId) {
@@ -54,7 +62,11 @@ export default function LoginForm() {
             }
         } catch (err) {
             setIsLoading(false);
-            setError(err.response?.data?.error || 'Login failed. Please try again.');
+            if (err.response?.status === 401 || err.response?.data?.error === 'Invalid credentials' || err.response?.data?.error === 'Invalid username or password') {
+                setError('Incorrect username or password.');
+            } else {
+                setError(err.response?.data?.error || 'Login failed. Please try again.');
+            }
         }
     };
 
@@ -76,12 +88,21 @@ export default function LoginForm() {
     }, []);
 
     return (
-        <div className='min-h-screen min-w-screen bg-base-300 flex flex-col pb-40'>
+        <div className='min-h-screen min-w-screen bg-base-300 flex flex-col pb-20 md:pb-40'>
+            <Toaster />
             <Navbar></Navbar>
-            <div className='flex flex-col w-xl h-[500px] pt-10 items-center mx-auto mt-40 bg-base-100 shadow-2xl rounded-3xl'>
-                <form className='flex flex-col items-center' onSubmit={handleSubmit} ref={formRef}>
-                    <label className='font-bold text-3xl'>LOGIN</label>
-                    <label className="input h-12 w-70 mt-10 focus-within:outline-transparent focus-within:border-b-4 focus-within:border- rounded-2xl">
+            <div className='flex flex-col w-11/12 md:w-3/4 lg:w-1/2 max-w-xl h-auto items-center pb-10 mx-auto mt-20 md:mt-32 lg:mt-40 bg-base-100 shadow-2xl rounded-3xl'>
+                <div className='h-10 pb-10'>
+                    {isLoading && (
+                        <div className='flex justify-center items-center py-4'>
+                            <span className="loading loading-infinity loading-lg"></span>
+                            <span className="ml-2">Loading...</span>
+                        </div>
+                    )}
+                </div>
+                <form className='flex flex-col items-center w-full px-4' onSubmit={handleSubmit} ref={formRef}>
+                    <label className='font-bold text-2xl md:text-3xl'>LOGIN</label>
+                    <label className="input input-primary h-12 w-full max-w-xs mt-10 focus-within:outline-transparent rounded-2xl">
                         <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g
                                 strokeLinejoin="round"
@@ -101,21 +122,17 @@ export default function LoginForm() {
                             required
                             placeholder="Username"
                             pattern="[A-Za-z][A-Za-z0-9\-]*"
-                            minlength="3"
-                            maxlength="30"
+                            minLength="3"
+                            maxLength="30"
                             title="Only letters, numbers or dash"
                         />
                     </label>
-                    <p className="validator-hint">
-                        Must be 3 to 30 characters
-                        <br />containing only letters, numbers or dash
-                    </p>
-                    <label className='input focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
-                        <svg class="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <label className='input input-primary bg- h-12 w-full max-w-xs mt-5 focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
+                        <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g
-                                stroke-linejoin="round"
-                                stroke-linecap="round"
-                                stroke-width="2.5"
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                strokeWidth="2.5"
                                 fill="none"
                                 stroke="currentColor"
                             >
@@ -133,16 +150,20 @@ export default function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </label>
-                    <span style={{ marginTop: "23px" }}>Don't have an account? <Link to={"/register"}>Register</Link></span>
+
+                    <span style={{ marginTop: "23px" }} className="text-sm md:text-base text-center px-2">Don't have an account? <Link className='link link-primary link-hover' to={"/register"}>Register</Link></span>
                 </form>
                 <button
-                    className='btn btn-primary'
+                    className='btn rounded-2xl btn-primary mt-5 w-3/4 md:w-1/2'
                     type="button"
                     disabled={isLoading}
                     onClick={handleButtonClick}
                 >
                     {isLoading ? 'Logging in...' : 'Login'}
                 </button>
+                <div className='h-10'>
+                    {error && <p className="text-red-500 mt-2 text-center text-sm md:text-base px-2">{error}</p>}
+                </div>
             </div>
         </div>
     )

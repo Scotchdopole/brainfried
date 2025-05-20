@@ -1,8 +1,39 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../authContext';
+import { toast } from 'react-hot-toast';
 
 export default function Navbar() {
+    const { isLoggedIn, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast.success("Logged out successfully!", {
+                style: {
+                    borderRadius: '10px',
+                    background: '#191e24',
+                    color: '#fff',
+                },
+                position: "top-center",
+                duration: 3000
+            });
+            navigate('/login');
+        } catch (error) {
+            console.error("Logout failed:", error);
+            toast.error("Logout failed. Please try again.", {
+                style: {
+                    borderRadius: '10px',
+                    background: '#191e24',
+                    color: '#fff',
+                },
+                position: "top-center",
+                duration: 3000
+            });
+        }
+    };
+
     return (
         <div className="navbar bg-base-100 shadow-sm max-w-7xl mx-auto rounded-3xl relative top-5">
             <div className="navbar-start">
@@ -15,19 +46,22 @@ export default function Navbar() {
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                         <li><Link to="/explore">Explore</Link></li>
                         <li><Link to="/test">Brainrot test</Link></li>
-                        <li><Link>About</Link></li>
                     </ul>
                 </div>
                 <div className='hidden lg:flex gap-5'>
-                    <Link to="/explore" class="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
-                    <Link to="/test" class="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
-                    <Link class="btn hover:bg-primary rounded-2xl btn-ghost">About</Link>
+                    <Link to="/explore" className="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
+                    <Link to="/test" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
                 </div>
             </div>
             <div className="navbar-center">
                 <Link to="/" className="btn border-0 bg-transparent shadow-none text-xl">Brainfried</Link>
             </div>
             <div className="navbar-end">
+                {isLoggedIn ? (
+                    <button onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</button>
+                ) : (
+                    <Link to="/login" className="btn hover:bg-primary rounded-2xl btn-ghost">Login</Link>
+                )}
                 <button className="btn btn-ghost btn-circle">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /> </svg>
                 </button>
@@ -39,5 +73,5 @@ export default function Navbar() {
                 </button>
             </div>
         </div>
-    )
+    );
 }

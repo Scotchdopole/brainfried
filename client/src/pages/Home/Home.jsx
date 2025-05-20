@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import Banner from '../../components/Banner/Banner'
 import { useAuth } from '../../authContext';
+import { Toaster, toast } from 'react-hot-toast';
 
 export default function Home() {
 
@@ -16,6 +17,7 @@ export default function Home() {
 
     return (
         <div className='min-h-screen min-w-screen bg-base-300 flex flex-col'>
+            <Toaster />
             <Banner></Banner>
             <Navbar></Navbar>
             <div className="hero bg-base mt-60 w-full mx-auto lg:max-w-3/4 rounded-t-4xl grow items-start pt-20">

@@ -1,7 +1,8 @@
+import Navbar from '../../components/Navbar/Navbar'
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useRef, useState, useEffect } from 'react';
+import { Toaster, toast } from 'react-hot-toast';
 import { auth } from "../../userAuth";
-
 
 export default function RegisterPage() {
     const [username, setUsername] = useState('');
@@ -12,7 +13,6 @@ export default function RegisterPage() {
 
     const formRef = useRef(null);
     const navigate = useNavigate();
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,11 +29,24 @@ export default function RegisterPage() {
             await auth.register(username, password);
 
             setIsLoading(false);
+            toast.success("Registered! Please log in now", {
+                style: {
+                    borderRadius: '10px',
+                    background: '#191e24',
+                    color: '#fff',
+                },
+                position: "top-center",
+                duration: 5000
+            });
             navigate('/login');
 
         } catch (err) {
             setIsLoading(false);
-            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            if (err.response?.data?.message === 'Username is already taken') {
+                setError("Username already taken");
+            } else {
+                setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            }
         }
     };
 
@@ -54,60 +67,117 @@ export default function RegisterPage() {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
 
-
     return (
-        <>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit} ref={formRef}>
-                <div>
-                    <label htmlFor="username">Username:</label>
-                    <input
-                        type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                        placeholder="Enter your username"
-                    />
+        <div className='min-h-screen min-w-screen bg-base-300 flex flex-col pb-20 md:pb-40'>
+            <Toaster />
+            <Navbar></Navbar>
+            <div className='flex flex-col w-11/12 md:w-3/4 lg:w-1/2 max-w-xl h-auto items-center pb-10 mx-auto mt-20 md:mt-32 lg:mt-40 bg-base-100 shadow-2xl rounded-3xl'>
+                <div className='h-10 pb-10'>
+                    {isLoading && (
+                        <div className='flex justify-center items-center py-4'>
+                            <span className="loading loading-infinity loading-lg"></span>
+                            <span className="ml-2">Loading...</span>
+                        </div>
+                    )}
                 </div>
-                <div>
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        placeholder="Enter your password"
-                    />
+                <form className='flex flex-col items-center w-full px-4' onSubmit={handleSubmit} ref={formRef}>
+                    <label className='font-bold text-2xl md:text-3xl'>REGISTER</label>
+                    <label className="input input-primary validator h-12 w-full max-w-xs mt-10 focus-within:outline-transparent rounded-2xl">
+                        <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                strokeWidth="2.5"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </g>
+                        </svg>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            placeholder="Username"
+                            pattern="[A-Za-z][A-Za-z0-9\-]*"
+                            minLength="5"
+                            maxLength="30"
+                            title="Only letters, numbers or dash"
+                        />
+                    </label>
+                    <p className="validator-hint hidden text-sm text-center px-2 mt-1">
+                        Must be 3 to 30 characters
+                        <br />containing only letters, numbers or dash
+                    </p>
+                    <label className='input input-primary h-12 w-full max-w-xs mt-5 focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
+                        <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                strokeWidth="2.5"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
+                                ></path>
+                                <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                            </g>
+                        </svg>
+                        <input
+                            type="password"
+                            required
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                            title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+                        />
+                    </label>
+                    <p className="validator-hint hidden text-sm text-center px-2 mt-1">
+                        Must be more than 8 characters, including
+                        <br />At least one number <br />At least one lowercase letter <br />At least one uppercase letter
+                    </p>
+                    <label className='input input-primary h-12 w-full max-w-xs mt-5 focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
+                        <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                strokeWidth="2.5"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"
+                                ></path>
+                                <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                            </g>
+                        </svg>
+                        <input
+                            type="password"
+                            required
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </label>
+
+                    <span style={{ marginTop: "23px" }} className="text-sm md:text-base text-center px-2">Already have an account? <Link className='link link-primary link-hover' to={"/login"}>Login</Link></span>
+                </form>
+                <button
+                    className='btn btn-primary rounded-2xl mt-5 w-3/4 md:w-1/2'
+                    type="button"
+                    disabled={isLoading}
+                    onClick={handleButtonClick}
+                >
+                    {isLoading ? 'Registering...' : 'Register'}
+                </button>
+                <div className='h-10'>
+                    {error && <p className="text-red-500 mt-2 text-center text-sm md:text-base px-2">{error}</p>}
                 </div>
-                <div>
-                    <label htmlFor="confirmPassword">Confirm Password:</label>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        placeholder="Confirm your password"
-                    />
-                </div>
-
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-
-                <p style={{ marginTop: "23px" }}>
-                    Already have an account? <Link to={"/login"}>Login</Link>
-                </p>
-            </form>
-
-            <button
-                className='RegisterPage-SubmitButton'
-                type="button"
-                disabled={isLoading}
-                onClick={handleButtonClick}
-            >
-                {isLoading ? 'Registering...' : 'Register'}
-            </button>
-        </>
+            </div>
+        </div>
     );
 }

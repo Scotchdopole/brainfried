@@ -64,7 +64,7 @@ export default function ProductDetail() {
             <Navbar></Navbar>
             <div className='flex flex-row w-5xl h-[500px] mx-auto mt-40 shadow-2xl rounded-3xl'>
                 <div className='aspect-square border-4 rounded-l-3xl border-base-100 flex justify-center items-center'>
-                    <img className='aspect-square w-full' src={productData.imageUrl} alt="" />
+                    <img className='aspect-square w-full object-contain' src={productData.imageUrl} alt="" />
                 </div>
                 <div className='bg-base-100 rounded-r-3xl w-full py-5 px-10'>
                     <p className='font-bold text-5xl'>{productData.name}</p>
