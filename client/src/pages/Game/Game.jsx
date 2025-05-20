@@ -1,38 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import playerImage from '../../../public/images/player.jfif';
+import blueBlockImage from '../../../public/images/blue_block.webp';
+import redBlockImage from '../../../public/images/red_block.png';
+
 export default function CatchBlocksGame() {
-    const width = 400;
-    const height = 300;
-    const blockSize = 20;
-    const playerSize = 20;
-    const playerY = height - playerSize - 10;
-    const playerSpeed = 8; // Rychlost pohybu hráče
+    const width = 600;
+    const height = 450;
+    const blockSize = 50;
+    const playerSize = 40;
+    const playerY = height - playerSize - 15;
+    const playerSpeed = 10;
 
     const [score, setScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
     const [playerX, setPlayerX] = useState(width / 2 - playerSize / 2);
     const [obstacles, setObstacles] = useState([]);
 
-    const intervalRef = useRef(); // Ref pro ID intervalu
-    const gameLoopRef = useRef(); // Ref pro držení aktuální verze funkce herní logiky
-    // Ref pro sledování, které klávesy jsou aktuálně drženy
+    const intervalRef = useRef();
+    const gameLoopRef = useRef();
     const keysPressedRef = useRef(new Set());
 
-    // Effekt 1: Definuje a aktualizuje funkci herní logiky (moveGame).
-    // Tento effekt se spustí, když se změní stav nebo konstanty, které funkce moveGame používá,
-    // a zajistí, že gameLoopRef.current vždy odkazuje na funkci s nejnovějšími hodnotami.
+    const startGame = () => {
+        setGameStarted(true);
+        resetGame();
+    };
+
+    const resetGame = () => {
+        setScore(0);
+        setGameOver(false);
+        setPlayerX(width / 2 - playerSize / 2);
+        setObstacles([]);
+        keysPressedRef.current.clear();
+    };
+
     useEffect(() => {
-        // Pomocná funkce pro vytvoření nové překážky
         const spawnObstacle = (currentPlayerX) => {
             let x;
-            // Zajišťujeme, že se nová překážka neobjeví blízko hráče
             do {
                 x = Math.floor(Math.random() * (width - blockSize));
-            } while (Math.abs(x - currentPlayerX) < blockSize * 1.5); // Kontrola vzdálenosti
+            } while (Math.abs(x - currentPlayerX) < blockSize * 1.5);
 
-            const isBlue = Math.random() < 0.6; // Mírně zvýšená šance na modrou
+            const isBlue = Math.random() < 0.5;
             const newObstacle = {
-                id: Date.now() + Math.random(), // Unikátní ID pro klíče
+                id: Date.now() + Math.random(),
                 x,
                 y: 0,
                 color: isBlue ? "blue" : "red"
@@ -40,12 +52,7 @@ export default function CatchBlocksGame() {
             return newObstacle;
         };
 
-        // Hlavní funkce herní logiky, která bude volána intervalem.
-        // Tato funkce zachytí (closure) aktuální stavové proměnné a konstanty
-        // z renderu, ve kterém se tento effekt spustil.
         const moveGame = () => {
-            // --- Pohyb hráče ---
-            // Získej směr pohybu z refu držených kláves
             let playerVX = 0;
             if (keysPressedRef.current.has('ArrowLeft') && !keysPressedRef.current.has('ArrowRight')) {
                 playerVX = -1;
@@ -53,30 +60,20 @@ export default function CatchBlocksGame() {
                 playerVX = 1;
             }
 
-            // Vypočítej novou pozici hráče
             const newPlayerX = playerX + playerVX * playerSpeed;
-
-            // Omezení pohybu hráče v rámci hrací plochy a aktualizace stavu
             const clampedPlayerX = Math.max(0, Math.min(width - playerSize, newPlayerX));
-
-            // Aktualizuj stav playerX - to spustí re-render a tento useEffect se znovu spustí,
-            // čímž se gameLoopRef.current aktualizuje s novou pozicí hráče v closure.
             setPlayerX(clampedPlayerX);
 
-            // --- Pohyb a logika překážek ---
-            // 1. Posuň stávající překážky a filtruj ty mimo obrazovku
             let nextObstacles = obstacles
-                .map(obs => ({ ...obs, y: obs.y + 5 }))
+                .map(obs => ({ ...obs, y: obs.y + 9 }))
                 .filter(obs => obs.y < height);
 
             let currentScore = score;
             let isGameOver = false;
 
-            // 2. Zpracuj kolize s přeživšími překážkami
             const remainingObstaclesAfterCollision = [];
             for (let obs of nextObstacles) {
-                // Přesnější AABB (Axis-Aligned Bounding Box) kolize check
-                const pLeft = clampedPlayerX; // Použij novou (již aktualizovanou) pozici hráče pro kolizi
+                const pLeft = clampedPlayerX;
                 const pRight = clampedPlayerX + playerSize;
                 const pTop = playerY;
                 const pBottom = playerY + playerSize;
@@ -96,77 +93,59 @@ export default function CatchBlocksGame() {
                 if (collided) {
                     if (obs.color === "red") {
                         isGameOver = true;
-                        break; // Při kolizi s červenou hned konec kontroly kolizí
+                        break;
                     } else if (obs.color === "blue") {
-                        currentScore += 1; // Zvyš skóre
-                        continue; // Přeskoč přidání této překážky do remaining
+                        currentScore += 1;
+                        continue;
                     }
                 }
-                // Překážka, která nekolidovala nebo byla červená (a ještě neskončila hra), se přidává
                 remainingObstaclesAfterCollision.push(obs);
             }
 
-            // 3. Aktualizuj stav skóre a konce hry
             setScore(currentScore);
             setGameOver(isGameOver);
 
-            // 4. Aktualizuj překážky a potenciálně spawni novou, pokud hra neskončila
             if (!isGameOver) {
                 setObstacles(remainingObstaclesAfterCollision);
-                // Spawni novou překážku s menší šancí
-                if (Math.random() < 0.1) {
-                    // Použij funkční aktualizaci pro obstacles při přidávání
-                    setObstacles(prevObs => [...prevObs, spawnObstacle(clampedPlayerX)]); // Použij novou pozici hráče
+                if (Math.random() < 0.15) {
+                    setObstacles(prevObs => [...prevObs, spawnObstacle(clampedPlayerX)]);
                 }
             } else {
-                // Pokud nastal konec hry, vymaž překážky
                 setObstacles([]);
             }
-        }; // Konec definice funkce moveGame
+        };
 
-        // Ulož aktuální verzi funkce moveGame do refu.
-        gameLoopRef.current = moveGame;
-
-        // Závislosti: Všechny stavové proměnné a relevantní konstanty, které funkce moveGame přímo používá
-        // (kromě keysPressedRef, který se čte přímo z refu).
-    }, [gameOver, score, playerX, obstacles, width, playerSize, playerSpeed, blockSize, playerY]);
-
-    // Effekt 2: Spravuje nastavení/čištění intervalu na základě stavu gameOver.
-    // Tento effekt se spustí pouze při mountu/unmountu nebo když se změní gameOver.
-    useEffect(() => {
-        if (gameOver) {
-            clearInterval(intervalRef.current);
-            return;
+        if (gameStarted && !gameOver) {
+            gameLoopRef.current = moveGame;
         }
 
-        // Nastav interval pro spouštění herní logiky z refu.
-        intervalRef.current = setInterval(() => {
-            if (gameLoopRef.current) {
-                gameLoopRef.current();
-            }
-        }, 50); // Rychlost snímkování hry (rychlejší = plynulejší, ale náročnější)
+    }, [gameStarted, gameOver, score, playerX, obstacles, width, playerSize, playerSpeed, blockSize, playerY]);
 
-        // Cleanup
+    useEffect(() => {
+        if (gameStarted && !gameOver) {
+            intervalRef.current = setInterval(() => {
+                if (gameLoopRef.current) {
+                    gameLoopRef.current();
+                }
+            }, 35);
+        } else {
+            clearInterval(intervalRef.current);
+        }
+
         return () => clearInterval(intervalRef.current);
 
-    }, [gameOver]); // Závislost: Pouze gameOver řídí start/stop intervalu.
+    }, [gameStarted, gameOver]);
 
-    // Effekt 3: Zpracovává vstup z klávesnice pro sledování držených kláves.
-    // Tento effekt se stará o přidávání/odebírání kláves do/z keysPressedRef.
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (gameOver) return;
-            // Přidáme klávesu do setu, pokud je to šipka
+            if (!gameStarted || gameOver) return;
             if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
                 keysPressedRef.current.add(e.key);
-                // Volitelně můžete zabránit defaultnímu chování (např. scrollování stránky)
-                // e.preventDefault();
             }
         };
 
         const handleKeyUp = (e) => {
-            if (gameOver) return;
-            // Odebereme klávesu ze setu, pokud je to šipka
+            if (!gameStarted || gameOver) return;
             if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
                 keysPressedRef.current.delete(e.key);
             }
@@ -175,51 +154,88 @@ export default function CatchBlocksGame() {
         window.addEventListener("keydown", handleKeyDown);
         window.addEventListener("keyup", handleKeyUp);
 
-        // Cleanup
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("keyup", handleKeyUp);
         };
-    }, [gameOver]); // Závislost: Potřebuje stav gameOver pro aktivaci/deaktivaci vstupů
+    }, [gameStarted, gameOver]);
 
-    // Renderování zůstává stejné
     return (
-        <div className="w-[400px] h-[300px] bg-black text-white relative overflow-hidden border-2 border-white rounded">
-            {/* Hráč */}
+        <div className="flex justify-center items-start pt-10 min-h-screen bg-gray-800">
             <div
-                className="absolute bg-green-400"
+                className="bg-black text-white relative overflow-hidden border-2 border-white rounded"
                 style={{
-                    left: `${playerX}px`, // playerX je nyní aktualizováno plynule v intervalu
-                    top: `${playerY}px`,
-                    width: `${playerSize}px`,
-                    height: `${playerSize}px`
+                    width: `${width}px`,
+                    height: `${height}px`
                 }}
-            />
+            >
+                {/* Podmíněné vykreslování herní plochy nebo startovací obrazovky */}
+                {!gameStarted ? (
+                    // Startovací obrazovka
+                    <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                        <h1 className="text-4xl font-bold mb-6">Catch Brainrot</h1>
+                        <button
+                            onClick={startGame}
+                            // Stejné Tailwind CSS třídy pro tlačítko jako na Game Over
+                            className="px-8 py-8 btn btn-primary text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
+                        >
+                            Start Game
+                        </button>
+                    </div>
+                ) : (
+                    // Herní plocha
+                    <>
+                        {/* Hráč */}
+                        <img
+                            src={playerImage}
+                            alt="Player"
+                            className="absolute"
+                            style={{
+                                left: `${playerX}px`,
+                                top: `${playerY}px`,
+                                width: `${playerSize}px`,
+                                height: `${playerSize}px`,
+                                objectFit: 'contain'
+                            }}
+                        />
 
-            {/* Kostky */}
-            {obstacles.map((obs) => (
-                <div
-                    key={obs.id}
-                    className={`absolute ${obs.color === "red" ? "bg-red-500" : "bg-blue-500"
-                        }`}
-                    style={{
-                        left: `${obs.x}px`,
-                        top: `${obs.y}px`,
-                        width: `${blockSize}px`,
-                        height: `${blockSize}px`
-                    }}
-                />
-            ))}
+                        {/* Kostky */}
+                        {obstacles.map((obs) => (
+                            <img
+                                key={obs.id}
+                                src={obs.color === "red" ? redBlockImage : blueBlockImage}
+                                alt={obs.color === "red" ? "Red Block" : "Blue Block"}
+                                className={`absolute`}
+                                style={{
+                                    left: `${obs.x}px`,
+                                    top: `${obs.y}px`,
+                                    width: `${blockSize}px`,
+                                    height: `${blockSize}px`,
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        ))}
 
-            {/* Skóre */}
-            <div className="absolute top-1 left-1 text-xs">Score: {score}</div>
+                        {/* Skóre */}
+                        <div className="absolute top-2 left-2 text-base">Score: {score}</div>
 
-            {/* Game Over */}
-            {gameOver && (
-                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center text-xl">
-                    Game Over
-                </div>
-            )}
+                        {/* Game Over */}
+                        {gameOver && (
+                            // Stejné Tailwind CSS třídy jako na startovací obrazovce
+                            <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                                <div className="text-4xl font-bold mb-6">Game Over</div> {/* Zvětšený text */}
+                                <button
+                                    onClick={resetGame}
+                                    // Stejné Tailwind CSS třídy pro tlačítko jako na startovací obrazovce
+                                    className="px-8 py-8 btn btn-primary rounded-2xl text-white font-bold cursor-pointer transition-colors duration-200 text-2xl"
+                                >
+                                    Restart Game
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }
