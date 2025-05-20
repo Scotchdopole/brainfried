@@ -4,16 +4,22 @@ import Home from './Home/Home'
 import BrainrotTest from './BrainrotTest/BrainrotTest'
 import ProductPage from './ProductPage/ProductPage'
 import ProductDetail from "./ProductDetail/ProductDetail"
+import Game from "./Game/Game"
+import LoginFrom from './LoginForm/LoginForm'
+import RegisterForm from './RegisterPage/RegisterPage'
 
 
 export default function AppRouter() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<Home/>} path='/' />
-                <Route element={<BrainrotTest/>} path='/test' />
-                <Route element={<ProductPage/>} path='/explore' />
-                <Route element={<ProductDetail/>} path='/product/:productId' />
+                <Route element={<Home />} path='/' />
+                <Route element={<BrainrotTest />} path='/test' />
+                <Route element={<ProductPage />} path='/explore' />
+                <Route element={<ProductDetail />} path='/product/:productId' />
+                <Route element={<Game />} path='/game' />
+                <Route element={<LoginFrom />} path='/login' />
+                <Route element={<RegisterForm />} path='/register' />
             </Routes>
         </BrowserRouter>
     )

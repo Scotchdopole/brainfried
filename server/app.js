@@ -9,6 +9,7 @@ require('dotenv').config()
 
 var indexRouter = require('./routes/index');
 var productRouter = require('./routes/products');
+var userRouter = require('./routes/users');
 
 
 var app = express();
@@ -35,6 +36,7 @@ app.use('/Images', express.static(path.join(__dirname, 'Images')));
 
 app.use('/', indexRouter);
 app.use('/products', productRouter);
+app.use('/users', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -4,18 +4,15 @@ import { Link } from "react-router-dom";
 export default function ProductCard({ product }) {
 
 
-    let productImage = (product && product.image) ? `http://localhost:3000/Images/${product.image}` : "";
-    console.log(productImage)
-
     return (
-        <div className="card bg-base-100 w-96 hover:border-primary border-b-8 border-transparent transition-all duration-300 shadow-lg rounded-3xl">
+        <div className="card bg-base-100 w-96 min-h-[25rem] hover:border-primary border-b-8 border-transparent transition-all duration-300 shadow-lg rounded-3xl">
             <figure className="px-10 pt-10">
                 <img
-                    src={productImage}
+                    src={product.imageUrl}
                     alt="product image"
-                    className="rounded-xl" />
+                    className="rounded-xl h-[20rem]" />
             </figure>
-            <div className="card-body flex-col w-full">
+            <div className="card-body flex justify-end flex-col w-full">
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-row gap-5 items-center">
                         <h2 className="card-title font-light">{product.name}</h2>

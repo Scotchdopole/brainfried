@@ -1,8 +1,19 @@
 import React from 'react'
 import Navbar from '../../components/Navbar/Navbar'
 import Banner from '../../components/Banner/Banner'
+import { useAuth } from '../../authContext';
 
 export default function Home() {
+
+    const { isLoggedIn } = useAuth();
+
+    if (isLoggedIn) {
+        console.log('You are logged in');
+    } else {
+        console.log('You are not logged in');
+    }
+
+
     return (
         <div className='min-h-screen min-w-screen bg-base-300 flex flex-col'>
             <Banner></Banner>
