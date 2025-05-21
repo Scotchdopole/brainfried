@@ -62,7 +62,7 @@ export default function LoginForm() {
             }
         } catch (err) {
             setIsLoading(false);
-            if (err.response?.status === 401 || err.response?.data?.error === 'Invalid credentials' || err.response?.data?.error === 'Invalid username or password') {
+            if (err.response?.status === 401 || err.response?.data?.message === 'Invalid username or password') {
                 setError('Incorrect username or password.');
             } else {
                 setError(err.response?.data?.error || 'Login failed. Please try again.');
