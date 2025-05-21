@@ -10,6 +10,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    userGameHighScore: {
+        type: String,
+        require: false
+    },
+    userGameHighScoreTime:{
+        type: String,
+        require: false
     }
 }, { timestamps: true });
 

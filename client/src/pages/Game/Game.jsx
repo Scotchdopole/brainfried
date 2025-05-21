@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import playerImage from '../../../public/images/player.jfif';
-import blueBlockImage from '../../../public/images/blue_block.webp';
-import redBlockImage from '../../../public/images/red_block.png';
+import playerImage from '../../assets/Images/player.jfif';
+import blueBlockImage from '../../assets/Images/blue_block.webp';
+import redBlockImage from '../../assets/Images/red_block.png';
 
 export default function CatchBlocksGame() {
     const width = 600;
