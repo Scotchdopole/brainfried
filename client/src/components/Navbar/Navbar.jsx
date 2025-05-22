@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../authContext';
 import { toast } from 'react-hot-toast';
+import { useCart } from "../../cartContext"
+import { FaShoppingCart } from 'react-icons/fa'; // Import ikony košíku
 
 export default function Navbar() {
     const { isLoggedIn, logout } = useAuth();
@@ -34,21 +36,30 @@ export default function Navbar() {
         }
     };
 
+    const { getTotalItems } = useCart();
+
     return (
         <div className="navbar bg-base-100 shadow-sm max-w-7xl mx-auto rounded-3xl relative top-5">
             <div className="navbar-start">
-                <div className="dropdown lg:hidden">
+                <div className="dropdown md:hidden">
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /> </svg>
                     </div>
                     <ul
                         tabIndex={0}
-                        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                        <li><Link to="/explore">Explore</Link></li>
-                        <li><Link to="/test">Brainrot test</Link></li>
+                        className="menu menu-sm dropdown-content bg-base-200 rounded-box z-1 mt-3 w-screen p-2 shadow">
+                        <li><Link className='btn hover:bg-primary rounded-2xl btn-ghost' to="/explore">Explore</Link></li>
+                        <li><Link className='btn hover:bg-primary rounded-2xl btn-ghost' to="/test">Brainrot test</Link></li>
+                        <li>
+                            {isLoggedIn ? (
+                                <Link onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</Link>
+                            ) : (
+                                <Link to="/login" className="btn hover:bg-primary rounded-2xl btn-ghost">Login</Link>
+                            )}
+                        </li>
                     </ul>
                 </div>
-                <div className='hidden lg:flex gap-5'>
+                <div className='hidden md:flex gap-5'>
                     <Link to="/explore" className="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
                     <Link to="/test" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
                 </div>
@@ -57,11 +68,21 @@ export default function Navbar() {
                 <Link to="/" className="btn border-0 bg-transparent shadow-none text-xl">Brainfried</Link>
             </div>
             <div className="navbar-end">
-                {isLoggedIn ? (
-                    <button onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</button>
-                ) : (
-                    <Link to="/login" className="btn hover:bg-primary rounded-2xl btn-ghost">Login</Link>
-                )}
+                <div tabIndex={0} className='hidden md:flex'>
+                    {isLoggedIn ? (
+                        <button onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</button>
+                    ) : (
+                        <Link to="/login" className="btn hover:bg-primary rounded-2xl btn-ghost">Login</Link>
+                    )}
+                </div>
+                <Link to="/cart" className="btn btn-ghost btn-circle">
+                    <div className="indicator">
+                        <FaShoppingCart size={16} />
+                        {getTotalItems() > 0 && (
+                            <span className="badge badge-sm badge-primary indicator-item">{getTotalItems()}</span>
+                        )}
+                    </div>
+                </Link>
                 <button className="btn btn-ghost btn-circle">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /> </svg>
                 </button>
@@ -72,6 +93,6 @@ export default function Navbar() {
                     </div>
                 </button>
             </div>
-        </div>
+        </div >
     );
 }

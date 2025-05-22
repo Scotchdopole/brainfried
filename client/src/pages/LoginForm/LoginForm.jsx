@@ -89,7 +89,6 @@ export default function LoginForm() {
 
     return (
         <div className='min-h-screen min-w-screen bg-base-300 flex flex-col pb-20 md:pb-40'>
-            <Toaster />
             <Navbar></Navbar>
             <div className='flex flex-col w-11/12 md:w-3/4 lg:w-1/2 max-w-xl h-auto items-center pb-10 mx-auto mt-20 md:mt-32 lg:mt-40 bg-base-100 shadow-2xl rounded-3xl'>
                 <div className='h-10 pb-10'>
