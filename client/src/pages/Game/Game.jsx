@@ -136,6 +136,7 @@ export default function CatchBlocksGame() {
 
     }, [gameStarted, gameOver]);
 
+    // Ošetření pohybu hráče pomocí šipek
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameStarted || gameOver) return;
@@ -160,81 +161,116 @@ export default function CatchBlocksGame() {
         };
     }, [gameStarted, gameOver]);
 
-    return (
-        <div className="flex justify-center items-start pt-10 min-h-screen bg-gray-800">
-            <div
-                className="bg-black text-white relative overflow-hidden border-2 border-white rounded"
-                style={{
-                    width: `${width}px`,
-                    height: `${height}px`
-                }}
-            >
-                {/* Podmíněné vykreslování herní plochy nebo startovací obrazovky */}
-                {!gameStarted ? (
-                    // Startovací obrazovka
-                    <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
-                        <h1 className="text-4xl font-bold mb-6">Catch Brainrot</h1>
-                        <button
-                            onClick={startGame}
-                            // Stejné Tailwind CSS třídy pro tlačítko jako na Game Over
-                            className="px-8 py-8 btn btn-primary text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
-                        >
-                            Start Game
-                        </button>
-                    </div>
-                ) : (
-                    // Herní plocha
-                    <>
-                        {/* Hráč */}
-                        <img
-                            src={playerImage}
-                            alt="Player"
-                            className="absolute"
-                            style={{
-                                left: `${playerX}px`,
-                                top: `${playerY}px`,
-                                width: `${playerSize}px`,
-                                height: `${playerSize}px`,
-                                objectFit: 'contain'
-                            }}
-                        />
+    // Nový useEffect pro restart hry Enterem po Game Over
+    useEffect(() => {
+        const handleEnterRestart = (e) => {
+            // Pokud je hra skončená a je stisknut Enter
+            if (gameOver && e.key === "Enter") {
+                resetGame(); // Zavoláme funkci pro restart hry
+            }
+        };
 
-                        {/* Kostky */}
-                        {obstacles.map((obs) => (
+        window.addEventListener("keydown", handleEnterRestart);
+
+        return () => {
+            window.removeEventListener("keydown", handleEnterRestart);
+        };
+    }, [gameOver]); // Závislost na `gameOver` pro správné spuštění posluchače
+
+    return (
+        // Hlavní kontejner pro centrování obsahu
+        <div className="flex justify-center items-start pt-10 min-h-screen bg-base-300">
+            {/* Vnitřní kontejner pro uspořádání herní plochy a instrukcí vedle sebe */}
+            <div className="flex space-x-8">
+                {/* Herní plocha */}
+                <div
+                    className="bg-black text-white relative overflow-hidden border-2 border-white rounded-3xl"
+                    style={{
+                        width: `${width}px`,
+                        height: `${height}px`
+                    }}
+                >
+                    {!gameStarted ? (
+                        <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                            <h1 className="text-4xl font-bold mb-6">Catch Brainrot</h1>
+                            <button
+                                onClick={startGame}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
+                            >
+                                Start Game
+                            </button>
+                        </div>
+                    ) : (
+                        <>
                             <img
-                                key={obs.id}
-                                src={obs.color === "red" ? redBlockImage : blueBlockImage}
-                                alt={obs.color === "red" ? "Red Block" : "Blue Block"}
-                                className={`absolute`}
+                                src={playerImage}
+                                alt="Player"
+                                className="absolute"
                                 style={{
-                                    left: `${obs.x}px`,
-                                    top: `${obs.y}px`,
-                                    width: `${blockSize}px`,
-                                    height: `${blockSize}px`,
+                                    left: `${playerX}px`,
+                                    top: `${playerY}px`,
+                                    width: `${playerSize}px`,
+                                    height: `${playerSize}px`,
                                     objectFit: 'contain'
                                 }}
                             />
-                        ))}
 
-                        {/* Skóre */}
-                        <div className="absolute top-2 left-2 text-base">Score: {score}</div>
+                            {obstacles.map((obs) => (
+                                <img
+                                    key={obs.id}
+                                    src={obs.color === "red" ? redBlockImage : blueBlockImage}
+                                    alt={obs.color === "red" ? "Red Block" : "Blue Block"}
+                                    className={`absolute`}
+                                    style={{
+                                        left: `${obs.x}px`,
+                                        top: `${obs.y}px`,
+                                        width: `${blockSize}px`,
+                                        height: `${blockSize}px`,
+                                        objectFit: 'contain'
+                                    }}
+                                />
+                            ))}
 
-                        {/* Game Over */}
-                        {gameOver && (
-                            // Stejné Tailwind CSS třídy jako na startovací obrazovce
-                            <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
-                                <div className="text-4xl font-bold mb-6">Game Over</div> {/* Zvětšený text */}
-                                <button
-                                    onClick={resetGame}
-                                    // Stejné Tailwind CSS třídy pro tlačítko jako na startovací obrazovce
-                                    className="px-8 py-8 btn btn-primary rounded-2xl text-white font-bold cursor-pointer transition-colors duration-200 text-2xl"
-                                >
-                                    Restart Game
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+                            <div className="absolute top-2 left-2 text-base">Score: {score}</div>
+
+                            {gameOver && (
+                                <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                                    <div className="text-4xl font-bold mb-6">Game Over</div>
+                                    <button
+                                        onClick={resetGame}
+                                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
+                                    >
+                                        Restart Game
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+
+                {/* Postranní panel s instrukcemi */}
+                <div
+                    className="bg-base-100 text-white p-6 rounded-3xl border-2 border-white"
+                    style={{
+                        width: '280px',
+                        height: `${height}px`,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">How to Play: Catch Brainrot</h2>
+                        <ul className="list-disc list-inside text-lg space-y-2">
+                            <li>Start the game</li>
+                            <li>Use your arrow keys to move</li>
+                            <li>Try to catch as much brainrot as you can while avoiding the grass</li>
+                        </ul>
+                    </div>
+                    <div className="text-sm text-gray-400 mt-4">
+                        <p>Have fun and try to beat your high score!</p>
+                    </div>
+                </div>
             </div>
         </div>
     );
