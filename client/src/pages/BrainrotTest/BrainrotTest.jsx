@@ -121,7 +121,6 @@ export default function TestPage() {
 
     return (
         <div className='bg-base-300 min-h-screen min-w-screen'>
-            <Toaster />
             <Navbar />
             <div className="bg-base-300 flex flex-col justify-start mt-14 items-center">
                 <h1 className='font-font1 text-5xl font-bold'>Brainrot test</h1>

@@ -7,6 +7,7 @@ import ProductDetail from "./ProductDetail/ProductDetail"
 import Game from "./Game/Game"
 import LoginFrom from './LoginForm/LoginForm'
 import RegisterForm from './RegisterPage/RegisterPage'
+import Cart from './Cart/Cart'
 
 
 export default function AppRouter() {
@@ -20,6 +21,7 @@ export default function AppRouter() {
                 <Route element={<Game />} path='/game' />
                 <Route element={<LoginFrom />} path='/login' />
                 <Route element={<RegisterForm />} path='/register' />
+                <Route element={<Cart />} path='/cart' />
             </Routes>
         </BrowserRouter>
     )
