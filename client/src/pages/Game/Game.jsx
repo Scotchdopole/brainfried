@@ -3,8 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import playerImage from '../../../public/images/player.jfif';
 import blueBlockImage from '../../../public/images/blue_block.webp';
 import redBlockImage from '../../../public/images/red_block.png';
+import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 
-export default function CatchBlocksGame() {
+
+export default function Game() {
     const width = 600;
     const height = 450;
     const blockSize = 50;
@@ -17,6 +20,9 @@ export default function CatchBlocksGame() {
     const [gameStarted, setGameStarted] = useState(false);
     const [playerX, setPlayerX] = useState(width / 2 - playerSize / 2);
     const [obstacles, setObstacles] = useState([]);
+    // Nový stav pro sledování stisknutých tlačítek pro vizuální zvýraznění
+    const [leftArrowActive, setLeftArrowActive] = useState(false);
+    const [rightArrowActive, setRightArrowActive] = useState(false);
 
     const intervalRef = useRef();
     const gameLoopRef = useRef();
@@ -33,6 +39,9 @@ export default function CatchBlocksGame() {
         setPlayerX(width / 2 - playerSize / 2);
         setObstacles([]);
         keysPressedRef.current.clear();
+        // Resetujeme stav tlačítek
+        setLeftArrowActive(false);
+        setRightArrowActive(false);
     };
 
     useEffect(() => {
@@ -136,19 +145,27 @@ export default function CatchBlocksGame() {
 
     }, [gameStarted, gameOver]);
 
-    // Ošetření pohybu hráče pomocí šipek
+    // Ošetření pohybu hráče pomocí šipek a aktualizace stavu tlačítek
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!gameStarted || gameOver) return;
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            if (e.key === "ArrowLeft") {
                 keysPressedRef.current.add(e.key);
+                setLeftArrowActive(true); // Aktivujeme levé tlačítko
+            } else if (e.key === "ArrowRight") {
+                keysPressedRef.current.add(e.key);
+                setRightArrowActive(true); // Aktivujeme pravé tlačítko
             }
         };
 
         const handleKeyUp = (e) => {
             if (!gameStarted || gameOver) return;
-            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            if (e.key === "ArrowLeft") {
                 keysPressedRef.current.delete(e.key);
+                setLeftArrowActive(false); // Deaktivujeme levé tlačítko
+            } else if (e.key === "ArrowRight") {
+                keysPressedRef.current.delete(e.key);
+                setRightArrowActive(false); // Deaktivujeme pravé tlačítko
             }
         };
 
@@ -179,78 +196,140 @@ export default function CatchBlocksGame() {
 
     return (
         // Hlavní kontejner pro centrování obsahu
-        <div className="flex justify-center items-start pt-10 min-h-screen bg-base-300">
+        <div className="flex justify-center  items-center pt-10 min-h-screen bg-base-300">
             {/* Vnitřní kontejner pro uspořádání herní plochy a instrukcí vedle sebe */}
-            <div className="flex space-x-8">
-                {/* Herní plocha */}
-                <div
-                    className="bg-black text-white relative overflow-hidden border-2 border-white rounded-3xl"
-                    style={{
-                        width: `${width}px`,
-                        height: `${height}px`
-                    }}
-                >
-                    {!gameStarted ? (
-                        <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
-                            <h1 className="text-4xl font-bold mb-6">Catch Brainrot</h1>
-                            <button
-                                onClick={startGame}
-                                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
-                            >
-                                Start Game
-                            </button>
-                        </div>
-                    ) : (
-                        <>
-                            <img
-                                src={playerImage}
-                                alt="Player"
-                                className="absolute"
-                                style={{
-                                    left: `${playerX}px`,
-                                    top: `${playerY}px`,
-                                    width: `${playerSize}px`,
-                                    height: `${playerSize}px`,
-                                    objectFit: 'contain'
-                                }}
-                            />
-
-                            {obstacles.map((obs) => (
+            {/* Změna z flex-col na flex space-x-8 pro opětovné uspořádání vedle sebe */}
+            <div className="flex space-x-8 flex-col sm:flex-row items-center gap-10 sm:gap-0">
+                {/* Kontejner pro herní plochu a ovládací tlačítka pod ní */}
+                <div className="flex flex-col items-center"> {/* Tento div je novinka pro seskupení */}
+                    {/* Herní plocha */}
+                    <div
+                        className="bg-black text-white relative overflow-hidden border-2 border-white rounded-3xl"
+                        style={{
+                            width: `${width}px`,
+                            height: `${height}px`
+                        }}
+                    >
+                        {!gameStarted ? (
+                            <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                                <h1 className="text-4xl font-bold mb-6">Catch Brainrot</h1>
+                                <button
+                                    onClick={startGame}
+                                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
+                                >
+                                    Start Game
+                                </button>
+                            </div>
+                        ) : (
+                            <>
                                 <img
-                                    key={obs.id}
-                                    src={obs.color === "red" ? redBlockImage : blueBlockImage}
-                                    alt={obs.color === "red" ? "Red Block" : "Blue Block"}
-                                    className={`absolute`}
+                                    src={playerImage}
+                                    alt="Player"
+                                    className="absolute"
                                     style={{
-                                        left: `${obs.x}px`,
-                                        top: `${obs.y}px`,
-                                        width: `${blockSize}px`,
-                                        height: `${blockSize}px`,
+                                        left: `${playerX}px`,
+                                        top: `${playerY}px`,
+                                        width: `${playerSize}px`,
+                                        height: `${playerSize}px`,
                                         objectFit: 'contain'
                                     }}
                                 />
-                            ))}
 
-                            <div className="absolute top-2 left-2 text-base">Score: {score}</div>
+                                {obstacles.map((obs) => (
+                                    <img
+                                        key={obs.id}
+                                        src={obs.color === "red" ? redBlockImage : blueBlockImage}
+                                        alt={obs.color === "red" ? "Red Block" : "Blue Block"}
+                                        className={`absolute`}
+                                        style={{
+                                            left: `${obs.x}px`,
+                                            top: `${obs.y}px`,
+                                            width: `${blockSize}px`,
+                                            height: `${blockSize}px`,
+                                            objectFit: 'contain'
+                                        }}
+                                    />
+                                ))}
 
-                            {gameOver && (
-                                <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
-                                    <div className="text-4xl font-bold mb-6">Game Over</div>
-                                    <button
-                                        onClick={resetGame}
-                                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
-                                    >
-                                        Restart Game
-                                    </button>
-                                </div>
-                            )}
-                        </>
+                                <div className="absolute top-2 left-2 text-base">Score: {score}</div>
+
+                                {gameOver && (
+                                    <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl">
+                                        <div className="text-4xl font-bold mb-6">Game Over</div>
+                                        <button
+                                            onClick={resetGame}
+                                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-2xl"
+                                        >
+                                            Restart Game
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* Kontejner pro ovládací tlačítka pod hrou */}
+                    {gameStarted && !gameOver && (
+                        <div className="flex justify-center mt-4 space-x-4">
+                            <button
+                                // Zvětšení šipky a přidání min-width/min-height pro lepší vzhled
+                                className={`px-6 py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[60px] min-h-[50px] text-2xl ${leftArrowActive ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                                onClick={() => {
+                                    keysPressedRef.current.add('ArrowLeft');
+                                    setLeftArrowActive(true);
+                                    setTimeout(() => {
+                                        keysPressedRef.current.delete('ArrowLeft');
+                                        setLeftArrowActive(false);
+                                    }, 100);
+                                }}
+                                onMouseDown={() => {
+                                    keysPressedRef.current.add('ArrowLeft');
+                                    setLeftArrowActive(true);
+                                }}
+                                onMouseUp={() => {
+                                    keysPressedRef.current.delete('ArrowLeft');
+                                    setLeftArrowActive(false);
+                                }}
+                                onMouseLeave={() => {
+                                    keysPressedRef.current.delete('ArrowLeft');
+                                    setLeftArrowActive(false);
+                                }}
+                            >
+                                <FaArrowLeft />
+                            </button>
+                            <button
+                                // Zvětšení šipky a přidání min-width/min-height pro lepší vzhled
+                                className={`px-6 py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[60px] min-h-[50px] text-2xl ${rightArrowActive ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                                onClick={() => {
+                                    keysPressedRef.current.add('ArrowRight');
+                                    setRightArrowActive(true);
+                                    setTimeout(() => {
+                                        keysPressedRef.current.delete('ArrowRight');
+                                        setRightArrowActive(false);
+                                    }, 100);
+                                }}
+                                onMouseDown={() => {
+                                    keysPressedRef.current.add('ArrowRight');
+                                    setRightArrowActive(true);
+                                }}
+                                onMouseUp={() => {
+                                    keysPressedRef.current.delete('ArrowRight');
+                                    setRightArrowActive(false);
+                                }}
+                                onMouseLeave={() => {
+                                    keysPressedRef.current.delete('ArrowRight');
+                                    setRightArrowActive(false);
+                                }}
+                            >
+                                <FaArrowRight />
+                            </button>
+                        </div>
                     )}
                 </div>
 
                 {/* Postranní panel s instrukcemi */}
                 <div
-                    className="bg-base-100 text-white p-6 rounded-3xl border-2 border-white"
+                    className="bg-base-100 text-white p-6 rounded-3xl border-2 border-white" /* Odebrán mt-8, protože už není potřeba */
                     style={{
                         width: '280px',
                         height: `${height}px`,
@@ -263,7 +342,7 @@ export default function CatchBlocksGame() {
                         <h2 className="text-2xl font-bold mb-4">How to Play: Catch Brainrot</h2>
                         <ul className="list-disc list-inside text-lg space-y-2">
                             <li>Start the game</li>
-                            <li>Use your arrow keys to move</li>
+                            <li>Use your arrow keys or the buttons below to move</li>
                             <li>Try to catch as much brainrot as you can while avoiding the grass</li>
                         </ul>
                     </div>
