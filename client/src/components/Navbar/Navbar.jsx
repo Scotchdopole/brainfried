@@ -50,6 +50,7 @@ export default function Navbar() {
                         className="menu menu-sm dropdown-content bg-base-200 rounded-box z-1 mt-3 w-screen p-2 shadow">
                         <li><Link className='btn hover:bg-primary rounded-2xl btn-ghost' to="/explore">Explore</Link></li>
                         <li><Link className='btn hover:bg-primary rounded-2xl btn-ghost' to="/test">Brainrot test</Link></li>
+                        <li><Link className='btn hover:bg-primary rounded-2xl btn-ghost' to="/game">Brainrot catcher</Link></li>
                         <li>
                             {isLoggedIn ? (
                                 <Link onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</Link>
@@ -62,6 +63,7 @@ export default function Navbar() {
                 <div className='hidden md:flex gap-5'>
                     <Link to="/explore" className="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
                     <Link to="/test" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
+                    <Link to="/game" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot catcher</Link>
                 </div>
             </div>
             <div className="navbar-center">

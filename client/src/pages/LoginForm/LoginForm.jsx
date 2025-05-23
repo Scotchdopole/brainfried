@@ -55,11 +55,7 @@ export default function LoginForm() {
             });
             const userId = getUserIdFromToken();
 
-            if (userId) {
-                navigate(`/profile/${userId}`);
-            } else {
-                navigate('/');
-            }
+            navigate("/")
         } catch (err) {
             setIsLoading(false);
             if (err.response?.status === 401 || err.response?.data?.message === 'Invalid username or password') {

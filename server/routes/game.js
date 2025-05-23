@@ -1,7 +1,7 @@
 // routes/gameRoutes.js
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Zkontroluj správnou cestu k modelu User
+const User = require('../models/users'); // Zkontroluj správnou cestu k modelu User
 const jwt = require('jsonwebtoken'); // Pro ověření tokenu
 
 // Middleware pro ověření JWT tokenu
@@ -54,17 +54,20 @@ router.post('/save-highscore', authenticateToken, async (req, res) => {
 });
 
 // GET endpoint pro získání highscore (pro scoreboard)
+// GET endpoint pro získání highscore (pro scoreboard)
 router.get('/scoreboard', async (req, res) => {
     try {
-        const users = await User.find({})
-            .select('username userGameHighScore userGameHighScoreTime') // Vybereme jen potřebná pole
-            .sort({ userGameHighScore: -1 }) // Seřadíme podle highscore sestupně
-            .limit(10); // Omezíme na Top 10, můžeš změnit
+        const users = await User.find({
+            userGameHighScore: { $gt: 0 } // <-- PŘIDÁNO: Filtrujeme jen uživatele, kteří mají skóre větší než 0
+        })
+            .select('username userGameHighScore userGameHighScoreTime')
+            .sort({ userGameHighScore: -1 })
+            .limit(10);
 
         const scoreboardData = users.map(user => ({
             username: user.username,
-            score: user.userGameHighScore || 0, // Pokud nemá skóre, zobrazíme 0
-            time: user.userGameHighScoreTime ? user.userGameHighScoreTime.toLocaleString() : 'N/A' // Formátujeme datum a čas
+            score: user.userGameHighScore, // Teď už nemusíme dávat || 0, protože jsme filtrovali dříve
+            time: user.userGameHighScoreTime ? user.userGameHighScoreTime.toLocaleString() : 'N/A'
         }));
 
         res.status(200).json(scoreboardData);

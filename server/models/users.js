@@ -13,11 +13,11 @@ const userSchema = new mongoose.Schema({
     },
     userGameHighScore: {
         type: Number,
-        require: false
+        required: false
     },
     userGameHighScoreTime:{
         type: Date,
-        require: false
+        required: false
     }
 }, { timestamps: true });
 

@@ -110,7 +110,7 @@ export default function RegisterPage() {
                         Must be 3 to 30 characters
                         <br />containing only letters, numbers or dash
                     </p>
-                    <label className='input input-primary h-12 w-full max-w-xs mt-5 focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
+                    <label className='input input-primary validator h-12 w-full max-w-xs mt-5 focus-within:outline-transparent rounded-2xl'>
                         <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g
                                 strokeLinejoin="round"
@@ -131,13 +131,12 @@ export default function RegisterPage() {
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-                            title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+                            pattern="^(?=.*[a-zA-Z])(?=.*\d).{5,}$"
                         />
                     </label>
                     <p className="validator-hint hidden text-sm text-center px-2 mt-1">
-                        Must be more than 8 characters, including
-                        <br />At least one number <br />At least one lowercase letter <br />At least one uppercase letter
+                        Must be atleast 5 characters long and have
+                        <br />At least one number <br />At least one lowercase letter
                     </p>
                     <label className='input input-primary h-12 w-full max-w-xs mt-5 focus-within:outline-transparent focus-within:border-2 rounded-2xl'>
                         <svg className="h-[1.5em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
