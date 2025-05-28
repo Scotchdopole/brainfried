@@ -118,7 +118,7 @@ export default function Cart() {
                                     <span>{getTotalPrice()} Kč</span>
                                 </div>
                             </div>
-                            <button className="btn rounded-2xl btn-primary w-full mt-6">Proceed to Checkout</button>
+                            <Link to="/checkout"><button className="btn rounded-2xl btn-primary w-full mt-6">Proceed to Checkout</button></Link>
                         </div>
                     </div>
                 )}

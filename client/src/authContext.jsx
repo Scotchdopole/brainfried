@@ -1,13 +1,16 @@
-// AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { auth } from './userAuth';
 
 const AuthContext = createContext();
 
+const ADMIN_USER_ID = import.meta.env.VITE_ADMIN_USER_ID;
+console.log('AuthContext.jsx: ADMIN_USER_ID loaded:', ADMIN_USER_ID);
+
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState(null);
     const [username, setUsername] = useState(null);
+    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const getAuthDataFromToken = (token) => {
@@ -22,7 +25,6 @@ export const AuthProvider = ({ children }) => {
 
             const decoded = JSON.parse(jsonPayload);
             console.log('AuthContext.jsx: Decoded payload in getAuthDataFromToken:', decoded);
-            // Předpokládáme, že backend vrací { id: '...', username: '...' } v JWT payloadu
             return { id: decoded.id, username: decoded.username };
         } catch (e) {
             console.error('AuthContext.jsx: Error decoding token in getAuthDataFromToken:', e);
@@ -42,8 +44,9 @@ export const AuthProvider = ({ children }) => {
                     setIsLoggedIn(true);
                     setUserId(id);
                     setUsername(userFromToken);
-                    // DŮLEŽITÉ: Při inicializaci z localStorage zajistíme uložení 'user' dat.
-                    // To pokryje případy, kdy token existuje, ale 'user' data ne (např. starší tokeny)
+                    setIsCurrentUserAdmin(id === ADMIN_USER_ID);
+                    console.log('AuthContext.jsx: checkAuthStatus - isCurrentUserAdmin:', id === ADMIN_USER_ID);
+
                     localStorage.setItem('user', JSON.stringify({ id: id, username: userFromToken }));
                     console.log('AuthContext.jsx: checkAuthStatus - User is logged in from localStorage.');
                 } else {
@@ -55,6 +58,7 @@ export const AuthProvider = ({ children }) => {
                 setIsLoggedIn(false);
                 setUserId(null);
                 setUsername(null);
+                setIsCurrentUserAdmin(false);
             }
             setLoading(false);
         };
@@ -76,7 +80,9 @@ export const AuthProvider = ({ children }) => {
                     setIsLoggedIn(true);
                     setUserId(id);
                     setUsername(userFromToken);
-                    // ZDE JE KLÍČOVÁ ZMĚNA: Uložení 'user' dat HNED po úspěšném dekódování
+                    setIsCurrentUserAdmin(id === ADMIN_USER_ID);
+                    console.log('AuthContext.jsx: Login - isCurrentUserAdmin:', id === ADMIN_USER_ID);
+
                     localStorage.setItem('user', JSON.stringify({ id: id, username: userFromToken }));
                     console.log('AuthContext.jsx: User logged in and data saved to localStorage.');
                 } else {
@@ -100,12 +106,14 @@ export const AuthProvider = ({ children }) => {
         setIsLoggedIn(false);
         setUserId(null);
         setUsername(null);
+        setIsCurrentUserAdmin(false);
     };
 
     const value = {
         isLoggedIn,
         userId,
         username,
+        isCurrentUserAdmin,
         login,
         logout,
         loading

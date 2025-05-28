@@ -1,4 +1,3 @@
-// components/Scoreboard.jsx
 import React, { useEffect, useState } from 'react';
 
 export default function Scoreboard() {
@@ -15,20 +14,16 @@ export default function Scoreboard() {
                 }
                 const data = await response.json();
 
-                // VYLEPŠENÁ FILTRACE
                 const filteredData = data.filter(entry => {
-                    // 1. Zkontroluj, zda 'score' vůbec existuje v objektu
                     if (entry.score === undefined || entry.score === null) {
-                        return false; // Vyluč, pokud skóre chybí nebo je null
+                        return false;
                     }
-                    // 2. Pokus se skóre převést na číslo
                     const scoreAsNumber = Number(entry.score);
-                    // 3. Zkontroluj, zda je to platné číslo A je větší než 0
                     return !isNaN(scoreAsNumber) && scoreAsNumber > 0;
                 });
 
-                console.log("Raw data from API:", data); // Zkontroluj v konzoli, co přijde
-                console.log("Filtered data (should not contain 0 scores):", filteredData); // Zkontroluj, co zbylo po filtru
+                console.log("Raw data from API:", data);
+                console.log("Filtered data (should not contain 0 scores):", filteredData);
 
                 setScoreboardData(filteredData);
             } catch (err) {
@@ -76,13 +71,11 @@ export default function Scoreboard() {
                         </thead>
                         <tbody>
                             {scoreboardData.map((entry, index) => (
-                                // Použij nějaký unikátní klíč, username je OK, pokud je unikátní
                                 <tr key={entry.username || index} className={`${index % 2 === 0 ? 'bg-base-200' : 'bg-base-100'} hover:bg-base-content hover:text-base-100`}>
                                     <td className="py-3">{index + 1}.</td>
                                     <td className="py-3 font-semibold">{entry.username}</td>
                                     <td className="py-3 text-right">{entry.score}</td>
                                     <td className="py-3 text-right text-sm text-gray-400">
-                                        {/* Zde je vhodné formátovat datum */}
                                         {entry.time && !isNaN(new Date(entry.time)) ? new Date(entry.time).toLocaleDateString() : 'N/A'}
                                     </td>
                                 </tr>

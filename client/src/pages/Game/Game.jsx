@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from '../../authContext';
+import { Link } from "react-router-dom";
 
 import playerImage from '../../assets/Images/player.jfif';
 import blueBlockImage from '../../assets/Images/blue_block.webp';
@@ -7,6 +8,7 @@ import redBlockImage from '../../assets/Images/red_block.png';
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import Navbar from "../../components/Navbar/Navbar";
+
 
 export default function Game() {
     const { isLoggedIn, userId } = useAuth();
@@ -493,6 +495,7 @@ export default function Game() {
                                 <li>Start the game</li>
                                 <li>Use your arrow keys or the buttons below to move</li>
                                 <li>Catch as much brainrot as you can while avoiding grass</li>
+                                <li>To save your score in leaderboard, <Link className="link">Log in</Link></li>
                             </ul>
                         </div>
                     </div>
@@ -500,7 +503,7 @@ export default function Game() {
                     <div
                         className="bg-base-100 text-white p-6 rounded-3xl shadow-2xl w-full"
                     >
-                        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white text-center">High Scores</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white text-center">Leaderboard</h2>
                         {scoreboardLoading ? (
                             <div className="flex justify-center items-center h-24">
                                 <span className="loading loading-dots loading-lg"></span>

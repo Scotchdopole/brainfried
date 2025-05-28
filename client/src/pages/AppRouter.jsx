@@ -8,6 +8,10 @@ import Game from "./Game/Game"
 import LoginFrom from './LoginForm/LoginForm'
 import RegisterForm from './RegisterPage/RegisterPage'
 import Cart from './Cart/Cart'
+import Admin from './Admin/Admin'
+import CreateForm from './Admin/CreateForm/CreateForm'
+import ProtectedRoute from '../protectedRoute'
+import Checkout from './Checkout/Checkout'
 
 
 export default function AppRouter() {
@@ -22,6 +26,11 @@ export default function AppRouter() {
                 <Route element={<LoginFrom />} path='/login' />
                 <Route element={<RegisterForm />} path='/register' />
                 <Route element={<Cart />} path='/cart' />
+                <Route element={<Checkout />} path='/checkout' />
+                <Route element={<ProtectedRoute requiredAdmin={true} />}>
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/admin/create-form" element={<CreateForm />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     )
