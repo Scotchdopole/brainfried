@@ -67,15 +67,16 @@ export default function Navbar() {
                     <Link to="/explore" className="btn hover:bg-primary rounded-2xl btn-ghost">Explore</Link>
                     <Link to="/test" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot test</Link>
                     <Link to="/game" className="btn hover:bg-primary rounded-2xl btn-ghost">Brainrot catcher</Link>
-                    {isCurrentUserAdmin && (
-                        <Link to="/admin" className="btn hover:bg-primary rounded-2xl btn-ghost">Admin Panel</Link>
-                    )}
+
                 </div>
             </div>
             <div className="navbar-center">
                 <Link to="/" className="btn border-0 bg-transparent shadow-none text-xl">Brainfried</Link>
             </div>
             <div className="navbar-end">
+                {isCurrentUserAdmin && (
+                    <Link to="/admin" className="btn hover:bg-primary rounded-2xl btn-ghost">Admin Panel</Link>
+                )}
                 <div tabIndex={0} className='hidden md:flex'>
                     {isLoggedIn ? (
                         <button onClick={handleLogout} className="btn hover:bg-primary rounded-2xl btn-ghost">Logout</button>
