@@ -370,7 +370,7 @@ export default function Game() {
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-center">Catch Brainrot</h1>
                                 <button
                                     onClick={startGame}
-                                    className="px-6 py-2 sm:px-8 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-xl sm:text-2xl"
+                                    className="px-6 py-2 sm:px-8 sm:py-3 btn btn-primary text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-xl sm:text-2xl"
                                 >
                                     Start Game
                                 </button>
@@ -417,7 +417,7 @@ export default function Game() {
                                         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-center">Game Over</div>
                                         <button
                                             onClick={resetGame}
-                                            className="px-6 py-2 sm:px-8 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-xl sm:text-2xl"
+                                            className="px-6 py-2 sm:px-8 sm:py-3 btn btn-primary text-white font-bold rounded-2xl cursor-pointer transition-colors duration-200 text-xl sm:text-2xl"
                                         >
                                             Restart Game
                                         </button>
@@ -430,7 +430,7 @@ export default function Game() {
                         {gameStarted && !gameOver && (
                             <div className="flex justify-center mt-4 space-x-4">
                                 <button
-                                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${leftArrowActive ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${leftArrowActive ? 'btn btn-primary' : 'btn btn-primary'} text-white`}
                                     onClick={() => {
                                         keysPressedRef.current.add('ArrowLeft');
                                         setLeftArrowActive(true);
@@ -456,7 +456,7 @@ export default function Game() {
                                     <FaArrowLeft />
                                 </button>
                                 <button
-                                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${rightArrowActive ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                                    className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${rightArrowActive ? 'btn btn-primary' : 'btn btn-primary'} text-white`}
                                     onClick={() => {
                                         keysPressedRef.current.add('ArrowRight');
                                         setRightArrowActive(true);
@@ -495,7 +495,7 @@ export default function Game() {
                                 <li>Start the game</li>
                                 <li>Use your arrow keys or the buttons below to move</li>
                                 <li>Catch as much brainrot as you can while avoiding grass</li>
-                                <li>To save your score in leaderboard, <Link className="link">Log in</Link></li>
+                                <li>To save your score in leaderboard, <Link className="link">log in</Link></li>
                             </ul>
                         </div>
                     </div>
