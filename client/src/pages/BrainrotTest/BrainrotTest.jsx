@@ -125,7 +125,7 @@ export default function TestPage() {
             <div className="bg-base-300 flex flex-col justify-start mt-14 items-center">
                 <h1 className='font-font1 text-5xl font-bold'>Brainrot test</h1>
                 {!isVisible && (<p className="text-lg mb-6 w-auto">{quote}</p>)}
-                {!isVisible && (<button className="btn btn-primary mt-15" onClick={handleStart}>Start the test</button>)}
+                {!isVisible && (<button className="btn btn-primary mt-15 rounded-2xl" onClick={handleStart}>Start the test</button>)}
 
                 {isVisible && questionNumber < questions.length && (
                     <div className='mt-10 flex flex-col gap-5 pr-5 pl-5 items-center'>
