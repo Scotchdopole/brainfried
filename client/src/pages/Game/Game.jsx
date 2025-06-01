@@ -493,13 +493,7 @@ export default function Game() {
                                                 <td className="py-2 text-left font-semibold">{entry.username}</td>
                                                 <td className="py-2 text-right">{entry.score}</td>
                                                 <td className="py-2 text-right text-sm text-gray-400">
-                                                    {/* Corrected: Use 'entry.userGameHighScoreTime' and robust date check */}
-                                                    {entry.userGameHighScoreTime ? (
-                                                        (() => {
-                                                            const date = new Date(entry.userGameHighScoreTime);
-                                                            return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
-                                                        })()
-                                                    ) : 'N/A'}
+                                                    {entry.time && !isNaN(new Date(entry.time)) ? new Date(entry.time).toLocaleDateString() : 'N/A'}
                                                 </td>
                                             </tr>
                                         ))}
