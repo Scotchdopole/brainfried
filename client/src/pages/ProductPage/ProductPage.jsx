@@ -31,10 +31,9 @@ export default function ProductPage() {
         getProductData();
     }, []);
 
-
     if (loading) {
         return (
-            <div className="min-h-screen min-w-screen bg-base-300 flex flex-col">
+            <div className="min-h-screen bg-base-300 flex flex-col overflow-x-hidden">
                 <Navbar></Navbar>
                 <div className='flex justify-center mt-[-200px] min-h-screen'><span className="loading loading-infinity loading-xl">Loading products...</span></div>
             </div>
@@ -43,7 +42,7 @@ export default function ProductPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen min-w-screen bg-base-300 flex flex-col">
+            <div className="min-h-screen bg-base-300 flex flex-col overflow-x-hidden">
                 <Navbar></Navbar>
                 <div className='flex justify-center items-center mt-[-200px] min-h-screen'><span className='font-bold'>Error:{error}</span></div>
             </div>
@@ -52,7 +51,7 @@ export default function ProductPage() {
 
     if (productData.length === 0) {
         return (
-            <div className="min-h-screen min-w-screen bg-base-300 flex flex-col">
+            <div className="min-h-screen bg-base-300 flex flex-col overflow-x-hidden">
                 <Navbar></Navbar>
                 <div className='flex justify-center items-center mt-[-200px] min-h-screen'><span className='font-bold'>No products found.</span></div>
             </div>
@@ -60,12 +59,12 @@ export default function ProductPage() {
     }
 
     return (
-        <div className="min-h-screen min-w-screen bg-base-300 flex flex-col pb-40">
+        <div className="min-h-screen bg-base-300 flex flex-col pb-40 overflow-x-hidden">
             <Navbar></Navbar>
             <div className=' flex gap-5 flex-wrap mt-20 mx-auto justify-center' >
                 {
                     productData.map(product => (
-                        <div className="hover:mt-[-5px] transition-all" >
+                        <div className="hover:mt-[-5px] transition-all" key={product.id}>
                             <ProductCard product={product} />
                         </div>
                     ))

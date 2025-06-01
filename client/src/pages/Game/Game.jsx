@@ -13,7 +13,6 @@ import Navbar from "../../components/Navbar/Navbar";
 export default function Game() {
     const { isLoggedIn, userId } = useAuth();
 
-
     const BASE_WIDTH = 600;
     const BASE_HEIGHT = 450;
     const BASE_BLOCK_SIZE = 50;
@@ -21,22 +20,16 @@ export default function Game() {
     const BASE_PLAYER_Y_OFFSET = 15;
     const BASE_PLAYER_SPEED = 10;
 
-
-
     const [gameWidth, setGameWidth] = useState(BASE_WIDTH);
     const [gameHeight, setGameHeight] = useState(BASE_HEIGHT);
     const [blockSize, setBlockSize] = useState(BASE_BLOCK_SIZE);
     const [playerSize, setPlayerSize] = useState(BASE_PLAYER_SIZE);
 
     const [playerY, setPlayerY] = useState(BASE_HEIGHT - BASE_PLAYER_SIZE - BASE_PLAYER_Y_OFFSET);
-
     const [playerSpeedScaled, setPlayerSpeedScaled] = useState(BASE_PLAYER_SPEED);
-
-
 
     const [playerXBase, setPlayerXBase] = useState(BASE_WIDTH / 2 - BASE_PLAYER_SIZE / 2);
     const [obstaclesBase, setObstaclesBase] = useState([]);
-
 
     const [score, setScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
@@ -44,38 +37,31 @@ export default function Game() {
     const [leftArrowActive, setLeftArrowActive] = useState(false);
     const [rightArrowActive, setRightArrowActive] = useState(false);
 
-
     const [scoreboardData, setScoreboardData] = useState([]);
     const [scoreboardLoading, setScoreboardLoading] = useState(true);
     const [scoreboardError, setScoreboardError] = useState(null);
-
 
     const intervalRef = useRef();
     const gameLoopRef = useRef();
     const keysPressedRef = useRef(new Set());
     const latestScoreRef = useRef(score);
-    const gameContainerRef = useRef(null);
 
-
-
+    const gameParentContainerRef = useRef(null);
     const scaleRef = useRef(1);
-
 
     useEffect(() => {
         latestScoreRef.current = score;
     }, [score]);
 
-
     const updateGameDimensions = useCallback(() => {
-        if (gameContainerRef.current) {
-            const parentWidth = gameContainerRef.current.clientWidth;
+        if (gameParentContainerRef.current) {
+            const availableWidth = gameParentContainerRef.current.clientWidth;
 
+            let newWidth = Math.min(availableWidth, BASE_WIDTH);
 
-
-            let newWidth = Math.min(parentWidth, BASE_WIDTH);
-            const minWidth = 300;
-            if (newWidth < minWidth) {
-                newWidth = minWidth;
+            const minGameWindowWidth = 320;
+            if (newWidth < minGameWindowWidth) {
+                newWidth = minGameWindowWidth;
             }
 
             const newScale = newWidth / BASE_WIDTH;
@@ -89,11 +75,8 @@ export default function Game() {
             setPlayerSize(BASE_PLAYER_SIZE * newScale);
             setPlayerY(newHeight - (BASE_PLAYER_SIZE * newScale) - (BASE_PLAYER_Y_OFFSET * newScale));
             setPlayerSpeedScaled(BASE_PLAYER_SPEED * newScale);
-
-
         }
     }, []);
-
 
     useEffect(() => {
         updateGameDimensions();
@@ -101,12 +84,10 @@ export default function Game() {
         return () => window.removeEventListener('resize', updateGameDimensions);
     }, [updateGameDimensions]);
 
-
     const startGame = () => {
         setGameStarted(true);
         resetGame();
     };
-
 
     const resetGame = () => {
         setScore(0);
@@ -119,7 +100,6 @@ export default function Game() {
         setRightArrowActive(false);
         fetchScoreboard();
     };
-
 
     const saveHighScore = async (finalScore) => {
         console.log('Attempting to save highscore:', finalScore, 'Is logged in:', isLoggedIn);
@@ -157,7 +137,6 @@ export default function Game() {
         }
     };
 
-
     const fetchScoreboard = async () => {
         setScoreboardLoading(true);
         setScoreboardError(null);
@@ -176,18 +155,14 @@ export default function Game() {
         }
     };
 
-
     useEffect(() => {
         fetchScoreboard();
     }, []);
-
-
 
     useEffect(() => {
         const spawnObstacle = (currentPlayerXBase) => {
             let x;
             do {
-
                 x = Math.floor(Math.random() * (BASE_WIDTH - BASE_BLOCK_SIZE));
             } while (Math.abs(x - currentPlayerXBase) < BASE_BLOCK_SIZE * 1.5);
 
@@ -211,25 +186,20 @@ export default function Game() {
                 playerVX = 1;
             }
 
-
-
             const newPlayerXBase = playerXBase + playerVX * BASE_PLAYER_SPEED;
             const clampedPlayerXBase = Math.max(0, Math.min(BASE_WIDTH - BASE_PLAYER_SIZE, newPlayerXBase));
             setPlayerXBase(clampedPlayerXBase);
-
 
             const obstacleFallSpeedBase = 9;
             let nextObstaclesBase = obstaclesBase
                 .map(obs => ({ ...obs, y: obs.y + obstacleFallSpeedBase }))
                 .filter(obs => obs.y < BASE_HEIGHT);
 
-
             let currentScore = score;
             let isGameOver = false;
 
             const remainingObstaclesAfterCollision = [];
             for (let obs of nextObstaclesBase) {
-
                 const pLeft = clampedPlayerXBase * currentScale;
                 const pRight = (clampedPlayerXBase + BASE_PLAYER_SIZE) * currentScale;
                 const pTop = playerY;
@@ -239,7 +209,6 @@ export default function Game() {
                 const obsRight = (obs.x + BASE_BLOCK_SIZE) * currentScale;
                 const obsTop = obs.y * currentScale;
                 const obsBottom = (obs.y + BASE_BLOCK_SIZE) * currentScale;
-
 
                 const collided = !(
                     pRight < obsLeft ||
@@ -263,7 +232,6 @@ export default function Game() {
             setScore(currentScore);
             setGameOver(isGameOver);
 
-
             if (isGameOver && gameStarted) {
                 saveHighScore(latestScoreRef.current);
             }
@@ -285,7 +253,6 @@ export default function Game() {
 
     }, [gameStarted, gameOver, score, playerXBase, obstaclesBase, gameWidth, gameHeight, playerSize, playerY, latestScoreRef, isLoggedIn, blockSize, playerSpeedScaled]);
 
-
     useEffect(() => {
         if (gameStarted && !gameOver) {
             intervalRef.current = setInterval(() => {
@@ -300,7 +267,6 @@ export default function Game() {
         return () => clearInterval(intervalRef.current);
 
     }, [gameStarted, gameOver]);
-
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -334,7 +300,6 @@ export default function Game() {
         };
     }, [gameStarted, gameOver]);
 
-
     useEffect(() => {
         const handleEnterRestart = (e) => {
             if (gameOver && e.key === "Enter") {
@@ -349,23 +314,21 @@ export default function Game() {
         };
     }, [gameOver]);
 
-
     return (
-        <div className="min-h-screen min-w-screen bg-base-300 flex flex-col pb-20 md:pb-40">
+        <div className="min-h-screen bg-base-300 flex flex-col pb-20 md:pb-40 overflow-x-hidden">
             <Navbar></Navbar>
-            <div className="flex flex-col items-center justify-start pt-10 px-4 gap-10">
+            <div className="flex flex-col items-center justify-start pt-10 px-4 gap-10 w-full max-w-full overflow-hidden">
 
-                <div className="flex flex-col items-center w-full">
+                <div ref={gameParentContainerRef} className="flex flex-col items-center w-full max-w-[600px] mx-auto">
                     <div
-                        ref={gameContainerRef}
-                        className="bg-black text-white relative overflow-hidden shadow-2xl rounded-3xl max-w-full"
+                        className="bg-black text-white relative shadow-2xl rounded-3xl"
                         style={{
                             width: `${gameWidth}px`,
-                            height: `${gameHeight}px`
+                            height: `${gameHeight}px`,
+                            overflow: 'hidden'
                         }}
                     >
                         {!gameStarted ? (
-
                             <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl p-4">
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-center">Catch Brainrot</h1>
                                 <button
@@ -376,14 +339,12 @@ export default function Game() {
                                 </button>
                             </div>
                         ) : (
-
                             <>
                                 <img
                                     src={playerImage}
                                     alt="Player"
                                     className="absolute"
                                     style={{
-
                                         left: `${playerXBase * scaleRef.current}px`,
                                         top: `${playerY}px`,
                                         width: `${playerSize}px`,
@@ -399,7 +360,6 @@ export default function Game() {
                                         alt={obs.color === "red" ? "Red Block" : "Blue Block"}
                                         className={`absolute`}
                                         style={{
-
                                             left: `${obs.x * scaleRef.current}px`,
                                             top: `${obs.y * scaleRef.current}px`,
                                             width: `${blockSize}px`,
@@ -412,7 +372,6 @@ export default function Game() {
                                 <div className="absolute top-2 left-2 text-base sm:text-lg">Score: {score}</div>
 
                                 {gameOver && (
-
                                     <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-xl p-4">
                                         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-center">Game Over</div>
                                         <button
@@ -426,15 +385,14 @@ export default function Game() {
                             </>
                         )}
                     </div>
-                    <div className="h-20">
+                    <div className="h-20 w-full flex justify-center mt-4 px-4">
                         {gameStarted && !gameOver && (
-                            <div className="flex justify-center mt-4 space-x-4">
+                            <div className="flex justify-center space-x-4 max-w-full">
                                 <button
                                     className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${leftArrowActive ? 'btn btn-primary' : 'btn btn-primary'} text-white`}
                                     onClick={() => {
                                         keysPressedRef.current.add('ArrowLeft');
                                         setLeftArrowActive(true);
-
                                         setTimeout(() => {
                                             keysPressedRef.current.delete('ArrowLeft');
                                             setLeftArrowActive(false);
