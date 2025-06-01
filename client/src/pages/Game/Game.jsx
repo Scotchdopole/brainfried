@@ -98,7 +98,7 @@ export default function Game() {
         keysPressedRef.current.clear();
         setLeftArrowActive(false);
         setRightArrowActive(false);
-        fetchScoreboard();
+        fetchScoreboard(); // Fetch scoreboard on game reset
     };
 
     const saveHighScore = async (finalScore) => {
@@ -127,7 +127,7 @@ export default function Game() {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data.message);
-                fetchScoreboard();
+                fetchScoreboard(); // Refresh scoreboard after saving a new score
             } else {
                 const errorData = await response.json();
                 console.error('Failed to save highscore:', errorData.message);
@@ -146,6 +146,7 @@ export default function Game() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            // Assuming the backend sends an array of objects, each with 'username', 'score', and 'userGameHighScoreTime'
             setScoreboardData(data);
         } catch (err) {
             console.error("Failed to fetch scoreboard:", err);
@@ -157,7 +158,7 @@ export default function Game() {
 
     useEffect(() => {
         fetchScoreboard();
-    }, []);
+    }, []); // Fetch scoreboard on initial component mount
 
     useEffect(() => {
         const spawnObstacle = (currentPlayerXBase) => {
@@ -223,10 +224,10 @@ export default function Game() {
                         break;
                     } else if (obs.color === "blue") {
                         currentScore += 1;
-                        continue;
+                        continue; // Do not add blue obstacle back to remainingObstaclesAfterCollision
                     }
                 }
-                remainingObstaclesAfterCollision.push(obs);
+                remainingObstaclesAfterCollision.push(obs); // Only add if no collision or red block collision
             }
 
             setScore(currentScore);
@@ -239,11 +240,12 @@ export default function Game() {
             if (!isGameOver) {
                 setObstaclesBase(remainingObstaclesAfterCollision);
 
-                if (Math.random() < 0.15) {
+                // Adjust spawn rate/logic as needed
+                if (Math.random() < 0.15) { // Probability of spawning a new obstacle
                     setObstaclesBase(prevObs => [...prevObs, spawnObstacle(clampedPlayerXBase)]);
                 }
             } else {
-                setObstaclesBase([]);
+                setObstaclesBase([]); // Clear obstacles on game over
             }
         };
 
@@ -259,7 +261,7 @@ export default function Game() {
                 if (gameLoopRef.current) {
                     gameLoopRef.current();
                 }
-            }, 35);
+            }, 35); // Game loop update interval (approx 28 FPS)
         } else {
             clearInterval(intervalRef.current);
         }
@@ -313,6 +315,7 @@ export default function Game() {
             window.removeEventListener("keydown", handleEnterRestart);
         };
     }, [gameOver]);
+
 
     return (
         <div className="min-h-screen bg-base-300 flex flex-col pb-20 md:pb-40 overflow-x-hidden">
@@ -391,6 +394,7 @@ export default function Game() {
                                 <button
                                     className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${leftArrowActive ? 'btn btn-primary' : 'btn btn-primary'} text-white`}
                                     onClick={() => {
+                                        // For mobile click, simulate a brief key press
                                         keysPressedRef.current.add('ArrowLeft');
                                         setLeftArrowActive(true);
                                         setTimeout(() => {
@@ -406,7 +410,7 @@ export default function Game() {
                                         keysPressedRef.current.delete('ArrowLeft');
                                         setLeftArrowActive(false);
                                     }}
-                                    onMouseLeave={() => {
+                                    onMouseLeave={() => { // Important for dragging mouse off button
                                         keysPressedRef.current.delete('ArrowLeft');
                                         setLeftArrowActive(false);
                                     }}
@@ -416,6 +420,7 @@ export default function Game() {
                                 <button
                                     className={`px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold transition-colors duration-100 flex items-center justify-center min-w-[50px] min-h-[40px] sm:min-w-[60px] sm:min-h-[50px] text-xl sm:text-2xl ${rightArrowActive ? 'btn btn-primary' : 'btn btn-primary'} text-white`}
                                     onClick={() => {
+                                        // For mobile click, simulate a brief key press
                                         keysPressedRef.current.add('ArrowRight');
                                         setRightArrowActive(true);
                                         setTimeout(() => {
@@ -431,7 +436,7 @@ export default function Game() {
                                         keysPressedRef.current.delete('ArrowRight');
                                         setRightArrowActive(false);
                                     }}
-                                    onMouseLeave={() => {
+                                    onMouseLeave={() => { // Important for dragging mouse off button
                                         keysPressedRef.current.delete('ArrowRight');
                                         setRightArrowActive(false);
                                     }}
@@ -453,7 +458,7 @@ export default function Game() {
                                 <li>Start the game</li>
                                 <li>Use your arrow keys or the buttons below to move</li>
                                 <li>Catch as much brainrot as you can while avoiding grass</li>
-                                <li>To save your score in leaderboard, <Link className="link">log in</Link></li>
+                                <li>To save your score in leaderboard, <Link to="/login" className="link link-primary">log in</Link></li>
                             </ul>
                         </div>
                     </div>
@@ -488,7 +493,13 @@ export default function Game() {
                                                 <td className="py-2 text-left font-semibold">{entry.username}</td>
                                                 <td className="py-2 text-right">{entry.score}</td>
                                                 <td className="py-2 text-right text-sm text-gray-400">
-                                                    {entry.time && !isNaN(new Date(entry.time)) ? new Date(entry.time).toLocaleDateString() : 'N/A'}
+                                                    {/* Corrected: Use 'entry.userGameHighScoreTime' and robust date check */}
+                                                    {entry.userGameHighScoreTime ? (
+                                                        (() => {
+                                                            const date = new Date(entry.userGameHighScoreTime);
+                                                            return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
+                                                        })()
+                                                    ) : 'N/A'}
                                                 </td>
                                             </tr>
                                         ))}
